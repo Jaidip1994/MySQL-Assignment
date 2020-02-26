@@ -24,11 +24,22 @@ CREATE TABLE `bajaj1`(
 `50 Day MA` double
 );
 
+SELECT 
+	STR_TO_DATE(Date, '%d-%M-%Y') AS 'Date', 
+    `Close Price`,
+    avg(`Close Price`) over ( order by year(Date), month(Date), Day(Date) rows 20 preceding ) AS '20 Day MA' 
+FROM Bajaj_Auto;
+
+INSERT into bajaj1(`Date`,`Close Price`)
+SELECT 
+	STR_TO_DATE(Date, '%d-%M-%Y') AS 'Date', 
+    `Close Price`
+FROM Bajaj_Auto;
+
 -- 2. Eicher_Motors
 DESC Eicher_Motors;
 -- As it can be seen the Date is being considered as Text, so there is need to convert the Date Time
 Select Date, STR_TO_DATE(Date, '%d-%M-%Y') AS 'Date_As_Dateime' from Eicher_Motors limit 5;
-
 -- Create the New Table containing the date, close price, 20 Day MA and 50 Day MA.
 CREATE TABLE `eicher1`(
 `Date` Date,
