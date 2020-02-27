@@ -241,10 +241,12 @@ CREATE TABLE `master_stock` (
     `Infosys` DOUBLE,
     `Eicher` DOUBLE,
     `Hero` DOUBLE
-);        
+);
 
+-- Insert the data in the table        
+INSERT into master_stock(`Date`,`Bajaj`,`TCS`, `TVS`, `Infosys`, `Eicher`, `Hero` )
 SELECT 
-    b.date,
+    b.date AS 'Date',
     b.`Close Price` AS 'Bajaj',
     tc.`Close Price` AS 'TCS',
     tv.`Close Price` AS 'TVS',
@@ -254,12 +256,150 @@ SELECT
 FROM
     bajaj1 AS b
         INNER JOIN
-    tcs1 AS tc USING (date)
+    tcs1 AS tc ON b.date = tc.date
         INNER JOIN
-    tvs1 AS tv USING (date)
+    tvs1 AS tv ON b.date = tv.date
         INNER JOIN
-    infosys1 AS i USING (date)
+    infosys1 AS i ON b.date = i.date
         INNER JOIN
-    eicher1 AS e USING (date)
+    eicher1 AS e ON b.date = e.date
         INNER JOIN
-    hero1 AS h USING (date);
+    hero1 AS h ON b.date = h.date;
+    
+-- Select the top 10 entries
+SELECT * from master_stock LIMIT 10;
+
+-- Use the table created in Part(1) to generate buy and sell signal. Store this in another table named 'bajaj2'. Perform this operation for all stocks.
+-- |++Date++|++Close Price++|++Signal++|
+
+-- Create Table bajaj2
+CREATE TABLE `bajaj2` (
+    `Date` DATE,
+    `Close Price` DOUBLE,
+    `Signal` VARCHAR(5)
+);
+
+-- Insert the data in the table & determine the Signal
+INSERT INTO bajaj2(`Date`,`Close Price`, `Signal`)
+SELECT date,
+`Close Price`,
+( case 
+	WHEN `20 Day MA` > `50 Day MA` then 'BUY'
+    WHEN `20 Day MA` < `50 Day MA` then 'SELL'
+    else 'HOLD'
+  end) AS 'Signal'
+FROM bajaj1;
+
+-- Select the top 5 entries
+SELECT * FROM bajaj2 LIMIT 5;
+
+-- Create Table eicher2
+CREATE TABLE `eicher2` (
+    `Date` DATE,
+    `Close Price` DOUBLE,
+    `Signal` VARCHAR(5)
+);
+
+-- Insert the data in the table & determine the Signal
+INSERT INTO eicher2(`Date`,`Close Price`, `Signal`)
+SELECT date,
+`Close Price`,
+( case 
+	WHEN `20 Day MA` > `50 Day MA` then 'BUY'
+    WHEN `20 Day MA` < `50 Day MA` then 'SELL'
+    else 'HOLD'
+  end) AS 'Signal'
+FROM eicher1;
+
+-- Select the top 5 entries
+SELECT * FROM eicher2 LIMIT 5;
+
+-- Create Table hero2
+CREATE TABLE `hero2` (
+    `Date` DATE,
+    `Close Price` DOUBLE,
+    `Signal` VARCHAR(5)
+);
+
+-- Insert the data in the table & determine the Signal
+INSERT INTO hero2(`Date`,`Close Price`, `Signal`)
+SELECT date,
+`Close Price`,
+( case 
+	WHEN `20 Day MA` > `50 Day MA` then 'BUY'
+    WHEN `20 Day MA` < `50 Day MA` then 'SELL'
+    else 'HOLD'
+  end) AS 'Signal'
+FROM hero1;
+
+-- Select the top 5 entries
+SELECT * FROM hero2 LIMIT 5;
+
+-- Create Table infosys2
+CREATE TABLE `infosys2` (
+    `Date` DATE,
+    `Close Price` DOUBLE,
+    `Signal` VARCHAR(5)
+);
+
+-- Insert the data in the table & determine the Signal
+INSERT INTO infosys2(`Date`,`Close Price`, `Signal`)
+SELECT date,
+`Close Price`,
+( case 
+	WHEN `20 Day MA` > `50 Day MA` then 'BUY'
+    WHEN `20 Day MA` < `50 Day MA` then 'SELL'
+    else 'HOLD'
+  end) AS 'Signal'
+FROM infosys1;
+
+-- Select the top 5 entries
+SELECT * FROM infosys2 LIMIT 5;
+
+-- Create Table tcs2
+CREATE TABLE `tcs2` (
+    `Date` DATE,
+    `Close Price` DOUBLE,
+    `Signal` VARCHAR(5)
+);
+
+-- Insert the data in the table & determine the Signal
+INSERT INTO tcs2(`Date`,`Close Price`, `Signal`)
+SELECT date,
+`Close Price`,
+( case 
+	WHEN `20 Day MA` > `50 Day MA` then 'BUY'
+    WHEN `20 Day MA` < `50 Day MA` then 'SELL'
+    else 'HOLD'
+  end) AS 'Signal'
+FROM tcs1;
+
+-- Select the top 5 entries
+SELECT * FROM tcs2 LIMIT 5;
+
+-- Create Table tvs2
+CREATE TABLE `tvs2` (
+    `Date` DATE,
+    `Close Price` DOUBLE,
+    `Signal` VARCHAR(5)
+);
+
+-- Insert the data in the table & determine the Signal
+INSERT INTO tvs2(`Date`,`Close Price`, `Signal`)
+SELECT date,
+`Close Price`,
+( case 
+	WHEN `20 Day MA` > `50 Day MA` then 'BUY'  -- Golden Cross
+    WHEN `20 Day MA` < `50 Day MA` then 'SELL' -- Death Cross
+    else 'HOLD'
+  end) AS 'Signal'
+FROM tvs1;
+
+-- Select the top 5 entries
+SELECT * FROM tvs2 LIMIT 5;
+
+-- 4. Create a User defined function, that takes the date as input and returns the signal for that particular day (Buy/Sell/Hold) for the Bajaj stock.
+
+-- delimiter $$
+-- CREATE FUNCTION determine_signal( Inp_Date date )
+-- returns varchar(5) deterministic
