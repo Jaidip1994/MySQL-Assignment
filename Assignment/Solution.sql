@@ -39,8 +39,8 @@ SELECT
     `Close Price`
 FROM Bajaj_Auto)
 SELECT *, 
-	avg(`Close Price`) over ( order by year(Date), month(Date), Day(Date) rows 20 preceding ) AS '20 Day MA',
-    avg(`Close Price`) over ( order by year(Date), month(Date), Day(Date) rows 50 preceding ) AS '50 Day MA'
+	avg(`Close Price`) over ( order by year(Date), month(Date), Day(Date) rows 19 preceding ) AS '20 Day MA',
+    avg(`Close Price`) over ( order by year(Date), month(Date), Day(Date) rows 49 preceding ) AS '50 Day MA'
  FROM data_from_Bajaj_Auto;
  
 -- Select the top 25 entry 
@@ -75,8 +75,8 @@ SELECT
     `Close Price`
 FROM Eicher_Motors)
 SELECT *, 
-	avg(`Close Price`) over ( order by year(Date), month(Date), Day(Date) rows 20 preceding ) AS '20 Day MA',
-    avg(`Close Price`) over ( order by year(Date), month(Date), Day(Date) rows 50 preceding ) AS '50 Day MA'
+	avg(`Close Price`) over ( order by year(Date), month(Date), Day(Date) rows 19 preceding ) AS '20 Day MA',
+    avg(`Close Price`) over ( order by year(Date), month(Date), Day(Date) rows 49 preceding ) AS '50 Day MA'
  FROM data_from_Eicher_Motors;
 
 -- Select the top 25 entry 
@@ -111,8 +111,8 @@ SELECT
     `Close Price`
 FROM Hero_Motocorp)
 SELECT *, 
-	avg(`Close Price`) over ( order by year(Date), month(Date), Day(Date) rows 20 preceding ) AS '20 Day MA',
-    avg(`Close Price`) over ( order by year(Date), month(Date), Day(Date) rows 50 preceding ) AS '50 Day MA'
+	avg(`Close Price`) over ( order by year(Date), month(Date), Day(Date) rows 19 preceding ) AS '20 Day MA',
+    avg(`Close Price`) over ( order by year(Date), month(Date), Day(Date) rows 49 preceding ) AS '50 Day MA'
  FROM data_from_Hero_Motocorp;
 
 -- Select the top 25 entry 
@@ -147,8 +147,8 @@ SELECT
     `Close Price`
 FROM Infosys)
 SELECT *, 
-	avg(`Close Price`) over ( order by year(Date), month(Date), Day(Date) rows 20 preceding ) AS '20 Day MA',
-    avg(`Close Price`) over ( order by year(Date), month(Date), Day(Date) rows 50 preceding ) AS '50 Day MA'
+	avg(`Close Price`) over ( order by year(Date), month(Date), Day(Date) rows 19 preceding ) AS '20 Day MA',
+    avg(`Close Price`) over ( order by year(Date), month(Date), Day(Date) rows 49 preceding ) AS '50 Day MA'
  FROM data_from_Infosys;
 
 -- Select the top 25 entry 
@@ -182,8 +182,8 @@ SELECT
     `Close Price`
 FROM TCS)
 SELECT *, 
-	avg(`Close Price`) over ( order by year(Date), month(Date), Day(Date) rows 20 preceding ) AS '20 Day MA',
-    avg(`Close Price`) over ( order by year(Date), month(Date), Day(Date) rows 50 preceding ) AS '50 Day MA'
+	avg(`Close Price`) over ( order by year(Date), month(Date), Day(Date) rows 19 preceding ) AS '20 Day MA',
+    avg(`Close Price`) over ( order by year(Date), month(Date), Day(Date) rows 49 preceding ) AS '50 Day MA'
  FROM data_from_TCS;
 
 -- Select the top 25 entry 
@@ -204,10 +204,10 @@ Select Date, STR_TO_DATE(Date, '%d-%M-%Y') AS 'Date_As_Dateime' from TVS_Motors 
 
 -- Create the New Table containing the date, close price, 20 Day MA and 50 Day MA.
 CREATE TABLE `tvs1`(
-`Date` Date,
-`Close Price` double,
-`20 Day MA` double precision(10,2),
-`50 Day MA` double precision(10,2)
+	`Date` Date,
+	`Close Price` double,
+	`20 Day MA` double precision(10,2),
+	`50 Day MA` double precision(10,2)
 );
 
 -- Insert Data into the Table by fetching the Details from the Parent Table
@@ -218,9 +218,48 @@ SELECT
     `Close Price`
 FROM TVS_Motors)
 SELECT *, 
-	avg(`Close Price`) over ( order by year(Date), month(Date), Day(Date) rows 20 preceding ) AS '20 Day MA',
-    avg(`Close Price`) over ( order by year(Date), month(Date), Day(Date) rows 50 preceding ) AS '50 Day MA'
+	avg(`Close Price`) over ( order by year(Date), month(Date), Day(Date) rows 19 preceding ) AS '20 Day MA',
+    avg(`Close Price`) over ( order by year(Date), month(Date), Day(Date) rows 49 preceding ) AS '50 Day MA'
  FROM data_from_TVS_Motors;
 
 -- Select the top 25 entry 
 SELECT * from tvs1 limit 25;
+
+-- So Six tables were created 
+-- 1.bajaj1 , 2.eicher1 3.hero1 4.infosys1 5.tcs1 6.tv1 
+
+-- Create a master table containing the date and close price of all the six stocks. (Column header for the price is the name of the stock)
+-- The table header should appear as below:
+-- |++Date++|++Bajaj++|++TCS++|++TVS++|++Infosys++|++Eicher++|++Hero++|
+
+-- Creating the master table
+CREATE TABLE `master_stock` (
+    `Date` DATE,
+    `Bajaj` DOUBLE,
+    `TCS` DOUBLE,
+    `TVS` DOUBLE,
+    `Infosys` DOUBLE,
+    `Eicher` DOUBLE,
+    `Hero` DOUBLE
+);        
+
+SELECT 
+    b.date,
+    b.`Close Price` AS 'Bajaj',
+    tc.`Close Price` AS 'TCS',
+    tv.`Close Price` AS 'TVS',
+    i.`Close Price` AS 'Infosys',
+    e.`Close Price` AS 'Eicher',
+    h.`Close Price` AS 'Hero'
+FROM
+    bajaj1 AS b
+        INNER JOIN
+    tcs1 AS tc USING (date)
+        INNER JOIN
+    tvs1 AS tv USING (date)
+        INNER JOIN
+    infosys1 AS i USING (date)
+        INNER JOIN
+    eicher1 AS e USING (date)
+        INNER JOIN
+    hero1 AS h USING (date);
