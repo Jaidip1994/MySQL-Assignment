@@ -273,6 +273,8 @@ SELECT * from master_stock LIMIT 10;
 -- |++Date++|++Close Price++|++Signal++|
 
 -- Create Table bajaj2
+drop table if exists `bajaj2`;
+
 CREATE TABLE `bajaj2` (
     `Date` DATE,
     `Close Price` DOUBLE,
@@ -281,19 +283,31 @@ CREATE TABLE `bajaj2` (
 
 -- Insert the data in the table & determine the Signal
 INSERT INTO bajaj2(`Date`,`Close Price`, `Signal`)
-SELECT date,
-`Close Price`,
-( case 
-	WHEN `20 Day MA` > `50 Day MA` then 'BUY'
-    WHEN `20 Day MA` < `50 Day MA` then 'SELL'
-    else 'HOLD'
-  end) AS 'Signal'
-FROM bajaj1;
-
+select 
+		Date,
+		`Close Price` ,
+		case when first_value(is_short_grt) over w = nth_value(is_short_grt,2) over w then  'Hold'
+				when NTH_VALUE(is_short_grt,2) over w = 1 then 'Buy'
+				when NTH_VALUE(is_short_grt,2) over w = 0 then 'Sell'
+                else 'Hold'
+                end
+		 AS "Signal"
+	FROM
+(
+select
+		`Date`,
+		`Close Price` ,
+		if(`20 Day MA`>`50 Day MA`,'1','0') is_short_grt
+	from bajaj1
+) cross_tab
+window w as (order by Date rows 1 preceding );
+ 
 -- Select the top 5 entries
 SELECT * FROM bajaj2 LIMIT 5;
 
 -- Create Table eicher2
+drop table if exists `eicher2`;
+
 CREATE TABLE `eicher2` (
     `Date` DATE,
     `Close Price` DOUBLE,
@@ -315,6 +329,7 @@ FROM eicher1;
 SELECT * FROM eicher2 LIMIT 5;
 
 -- Create Table hero2
+drop table if exists `hero2`;
 CREATE TABLE `hero2` (
     `Date` DATE,
     `Close Price` DOUBLE,
@@ -336,6 +351,7 @@ FROM hero1;
 SELECT * FROM hero2 LIMIT 5;
 
 -- Create Table infosys2
+drop table if exists `infosys2`;
 CREATE TABLE `infosys2` (
     `Date` DATE,
     `Close Price` DOUBLE,
@@ -357,6 +373,7 @@ FROM infosys1;
 SELECT * FROM infosys2 LIMIT 5;
 
 -- Create Table tcs2
+drop table if exists `tcs2`;
 CREATE TABLE `tcs2` (
     `Date` DATE,
     `Close Price` DOUBLE,
@@ -378,6 +395,7 @@ FROM tcs1;
 SELECT * FROM tcs2 LIMIT 5;
 
 -- Create Table tvs2
+drop table if exists `tvs2`;
 CREATE TABLE `tvs2` (
     `Date` DATE,
     `Close Price` DOUBLE,
