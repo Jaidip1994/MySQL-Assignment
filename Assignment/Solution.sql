@@ -1,4 +1,7 @@
 -- Case Study: Stock Market Analysis
+
+-- Data Are imported using the Project Wizard
+
 -- Create Schema
 create schema Assignment;
 
@@ -272,9 +275,8 @@ SELECT * from master_stock LIMIT 10;
 -- Use the table created in Part(1) to generate buy and sell signal. Store this in another table named 'bajaj2'. Perform this operation for all stocks.
 -- |++Date++|++Close Price++|++Signal++|
 
--- Create Table bajaj2
 drop table if exists `bajaj2`;
-
+-- Create Table bajaj2
 CREATE TABLE `bajaj2` (
     `Date` DATE,
     `Close Price` DOUBLE,
@@ -289,7 +291,7 @@ select
 		case when first_value(is_short_grt) over w = nth_value(is_short_grt,2) over w then  'Hold'
 				when NTH_VALUE(is_short_grt,2) over w = 1 then 'Buy'
 				when NTH_VALUE(is_short_grt,2) over w = 0 then 'Sell'
-                else 'Hold'
+                else 'Hold' -- This is relevant only for the First Record as there is no Second Value 
                 end
 		 AS "Signal"
 	FROM
@@ -298,16 +300,16 @@ select
 		`Date`,
 		`Close Price` ,
 		if(`20 Day MA`>`50 Day MA`,'1','0') is_short_grt
-	from bajaj1
+	from bajaj1 order by Date
 ) cross_tab
 window w as (order by Date rows 1 preceding );
  
 -- Select the top 5 entries
 SELECT * FROM bajaj2 LIMIT 5;
 
--- Create Table eicher2
 drop table if exists `eicher2`;
 
+-- Create Table eicher2
 CREATE TABLE `eicher2` (
     `Date` DATE,
     `Close Price` DOUBLE,
@@ -316,14 +318,24 @@ CREATE TABLE `eicher2` (
 
 -- Insert the data in the table & determine the Signal
 INSERT INTO eicher2(`Date`,`Close Price`, `Signal`)
-SELECT date,
-`Close Price`,
-( case 
-	WHEN `20 Day MA` > `50 Day MA` then 'BUY'
-    WHEN `20 Day MA` < `50 Day MA` then 'SELL'
-    else 'HOLD'
-  end) AS 'Signal'
-FROM eicher1;
+select 
+		Date,
+		`Close Price` ,
+		case when first_value(is_short_grt) over w = nth_value(is_short_grt,2) over w then  'Hold'
+				when NTH_VALUE(is_short_grt,2) over w = 1 then 'Buy'
+				when NTH_VALUE(is_short_grt,2) over w = 0 then 'Sell'
+                else 'Hold' -- This is relevant only for the First Record as there is no Second Value 
+                end
+		 AS "Signal"
+	FROM
+(
+select
+		`Date`,
+		`Close Price` ,
+		if(`20 Day MA`>`50 Day MA`,'1','0') is_short_grt
+	from eicher1 order by Date
+) cross_tab
+window w as (order by Date rows 1 preceding );
 
 -- Select the top 5 entries
 SELECT * FROM eicher2 LIMIT 5;
@@ -338,14 +350,25 @@ CREATE TABLE `hero2` (
 
 -- Insert the data in the table & determine the Signal
 INSERT INTO hero2(`Date`,`Close Price`, `Signal`)
-SELECT date,
-`Close Price`,
-( case 
-	WHEN `20 Day MA` > `50 Day MA` then 'BUY'
-    WHEN `20 Day MA` < `50 Day MA` then 'SELL'
-    else 'HOLD'
-  end) AS 'Signal'
-FROM hero1;
+select 
+		Date,
+		`Close Price` ,
+		case when first_value(is_short_grt) over w = nth_value(is_short_grt,2) over w then  'Hold'
+				when NTH_VALUE(is_short_grt,2) over w = 1 then 'Buy'
+				when NTH_VALUE(is_short_grt,2) over w = 0 then 'Sell'
+                else 'Hold' -- This is relevant only for the First Record as there is no Second Value 
+                end
+		 AS "Signal"
+	FROM
+(
+select
+		`Date`,
+		`Close Price` ,
+		if(`20 Day MA`>`50 Day MA`,'1','0') is_short_grt
+	from hero1 order by Date
+) cross_tab
+window w as (order by Date rows 1 preceding );
+
 
 -- Select the top 5 entries
 SELECT * FROM hero2 LIMIT 5;
@@ -360,14 +383,24 @@ CREATE TABLE `infosys2` (
 
 -- Insert the data in the table & determine the Signal
 INSERT INTO infosys2(`Date`,`Close Price`, `Signal`)
-SELECT date,
-`Close Price`,
-( case 
-	WHEN `20 Day MA` > `50 Day MA` then 'BUY'
-    WHEN `20 Day MA` < `50 Day MA` then 'SELL'
-    else 'HOLD'
-  end) AS 'Signal'
-FROM infosys1;
+select 
+		Date,
+		`Close Price` ,
+		case when first_value(is_short_grt) over w = nth_value(is_short_grt,2) over w then  'Hold'
+				when NTH_VALUE(is_short_grt,2) over w = 1 then 'Buy'
+				when NTH_VALUE(is_short_grt,2) over w = 0 then 'Sell'
+                else 'Hold' -- This is relevant only for the First Record as there is no Second Value 
+                end
+		 AS "Signal"
+	FROM
+(
+select
+		`Date`,
+		`Close Price` ,
+		if(`20 Day MA`>`50 Day MA`,'1','0') is_short_grt
+	from infosys1 order by Date
+) cross_tab
+window w as (order by Date rows 1 preceding );
 
 -- Select the top 5 entries
 SELECT * FROM infosys2 LIMIT 5;
@@ -382,14 +415,24 @@ CREATE TABLE `tcs2` (
 
 -- Insert the data in the table & determine the Signal
 INSERT INTO tcs2(`Date`,`Close Price`, `Signal`)
-SELECT date,
-`Close Price`,
-( case 
-	WHEN `20 Day MA` > `50 Day MA` then 'BUY'
-    WHEN `20 Day MA` < `50 Day MA` then 'SELL'
-    else 'HOLD'
-  end) AS 'Signal'
-FROM tcs1;
+select 
+		Date,
+		`Close Price` ,
+		case when first_value(is_short_grt) over w = nth_value(is_short_grt,2) over w then  'Hold'
+				when NTH_VALUE(is_short_grt,2) over w = 1 then 'Buy'
+				when NTH_VALUE(is_short_grt,2) over w = 0 then 'Sell'
+                else 'Hold' -- This is relevant only for the First Record as there is no Second Value 
+                end
+		 AS "Signal"
+	FROM
+(
+select
+		`Date`,
+		`Close Price` ,
+		if(`20 Day MA`>`50 Day MA`,'1','0') is_short_grt
+	from tcs1 order by Date
+) cross_tab
+window w as (order by Date rows 1 preceding );
 
 -- Select the top 5 entries
 SELECT * FROM tcs2 LIMIT 5;
@@ -404,20 +447,37 @@ CREATE TABLE `tvs2` (
 
 -- Insert the data in the table & determine the Signal
 INSERT INTO tvs2(`Date`,`Close Price`, `Signal`)
-SELECT date,
-`Close Price`,
-( case 
-	WHEN `20 Day MA` > `50 Day MA` then 'BUY'  -- Golden Cross
-    WHEN `20 Day MA` < `50 Day MA` then 'SELL' -- Death Cross
-    else 'HOLD'
-  end) AS 'Signal'
-FROM tvs1;
+select 
+		Date,
+		`Close Price` ,
+		case when first_value(is_short_grt) over w = nth_value(is_short_grt,2) over w then  'Hold'
+				when NTH_VALUE(is_short_grt,2) over w = 1 then 'Buy'
+				when NTH_VALUE(is_short_grt,2) over w = 0 then 'Sell'
+                else 'Hold' -- This is relevant only for the First Record as there is no Second Value 
+                end
+		 AS "Signal"
+	FROM
+(
+select
+		`Date`,
+		`Close Price` ,
+		if(`20 Day MA`>`50 Day MA`,'1','0') is_short_grt
+	from tvs1 order by Date
+) cross_tab
+window w as (order by Date rows 1 preceding );
 
 -- Select the top 5 entries
 SELECT * FROM tvs2 LIMIT 5;
 
 -- 4. Create a User defined function, that takes the date as input and returns the signal for that particular day (Buy/Sell/Hold) for the Bajaj stock.
 
--- delimiter $$
--- CREATE FUNCTION determine_signal( Inp_Date date )
--- returns varchar(5) deterministic
+-- For Bajaj
+
+CREATE FUNCTION determine_signal( Inp_Date date )
+returns varchar(5) deterministic
+return ( select `Signal` from bajaj2  where `Date` = Inp_Date );
+
+-- I/P : Date ( YYYY-MM-DD )
+SELECT determine_signal('2015-05-15') 'Signal_Now';
+
+select * from bajaj2;  -- where `Date` = Inp_Date
