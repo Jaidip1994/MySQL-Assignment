@@ -1,7 +1,6 @@
 -- Case Study: Stock Market Analysis
 
--- Data Are imported using the Project Wizard
-
+-- Data Are being imported using the Project Wizard
 -- Create Schema
 create schema Assignment;
 
@@ -12,12 +11,14 @@ use Assignment;
 -- Check what all Tables are currently created
 SELECT table_name FROM information_schema.tables WHERE table_schema='Assignment';
 
+-- 1. Create a new table named 'bajaj1' containing the date, close price, 20 Day MA and 50 Day MA. (This has to be done for all 6 stocks)
+
 -- Lets check the description of Each Table
 -- 1. Bajaj_Auto
 DESC Bajaj_Auto;
 
 -- Checking how many Null Values are present
-SELECT COUNT(*) AS 'No of Null Dates', 
+SELECT COUNT(Assignment.Bajaj_Auto.Date) AS 'No of Null Dates', 
 	   COUNT(Assignment.Bajaj_Auto.`Close Price`) AS 'No of Null Close Price' 
 from Assignment.Bajaj_Auto
 WHERE Assignment.Bajaj_Auto.Date IS NULL OR 
@@ -27,6 +28,7 @@ WHERE Assignment.Bajaj_Auto.Date IS NULL OR
 Select Date, STR_TO_DATE(Date, '%d-%M-%Y') AS 'Date_As_Dateime' from Bajaj_Auto limit 5;
 
 -- Create the New Table containing the date, close price, 20 Day MA and 50 Day MA.
+DROP TABLE IF EXISTS `bajaj1`;
 CREATE TABLE `bajaj1`(
 `Date` Date,
 `Close Price` double,
@@ -47,13 +49,17 @@ SELECT *,
  FROM data_from_Bajaj_Auto;
  
 -- Select the top 25 entry 
-SELECT * from bajaj1 limit 25;
+SELECT 
+    `Date`, `20 Day MA`, `50 Day MA`
+FROM
+    bajaj1
+LIMIT 25;
 
 -- 2. Eicher_Motors
 DESC Eicher_Motors;
 
 -- Checking how many Null Values are present
-SELECT COUNT(*) AS 'No of Null Dates', 
+SELECT COUNT(Assignment.Eicher_Motors.Date) AS 'No of Null Dates', 
 	   COUNT(Assignment.Eicher_Motors.`Close Price`) AS 'No of Null Close Price' 
 from Assignment.Eicher_Motors
 WHERE Assignment.Eicher_Motors.Date IS NULL OR 
@@ -63,6 +69,8 @@ WHERE Assignment.Eicher_Motors.Date IS NULL OR
 Select Date, STR_TO_DATE(Date, '%d-%M-%Y') AS 'Date_As_Dateime' from Eicher_Motors limit 5;
 
 -- Create the New Table containing the date, close price, 20 Day MA and 50 Day MA.
+DROP table IF EXISTS `eicher1`;
+
 CREATE TABLE `eicher1`(
 `Date` Date,
 `Close Price` double,
@@ -88,8 +96,9 @@ SELECT * from eicher1 limit 25;
 -- 3. Hero_Motocorp
 DESC Hero_Motocorp;
 
+
 -- Checking how many Null Values are present & it can be seen no zeroes are present
-SELECT COUNT(*) AS 'No of Null Dates', 
+SELECT COUNT(Assignment.Hero_Motocorp.Date) AS 'No of Null Dates', 
 	   COUNT(Assignment.Hero_Motocorp.`Close Price`) AS 'No of Null Close Price' 
 from Assignment.Hero_Motocorp
 WHERE Assignment.Hero_Motocorp.Date IS NULL OR 
@@ -99,6 +108,8 @@ WHERE Assignment.Hero_Motocorp.Date IS NULL OR
 Select Date, STR_TO_DATE(Date, '%d-%M-%Y') AS 'Date_As_Dateime' from Hero_Motocorp limit 5;
 
 -- Create the New Table containing the date, close price, 20 Day MA and 50 Day MA.
+DROP table IF EXISTS `hero1`;
+
 CREATE TABLE `hero1`(
 `Date` Date,
 `Close Price` double,
@@ -135,6 +146,8 @@ WHERE Assignment.Infosys.Date IS NULL OR
 Select Date, STR_TO_DATE(Date, '%d-%M-%Y') AS 'Date_As_Dateime' from Infosys limit 5;
 
 -- Create the New Table containing the date, close price, 20 Day MA and 50 Day MA.
+DROP table IF EXISTS `infosys1`;
+
 CREATE TABLE `infosys1`(
 `Date` Date,
 `Close Price` double,
@@ -161,7 +174,7 @@ SELECT * from infosys1 limit 25;
 DESC TCS;
 
 -- Checking how many Null Values are present & it can be seen no zeroes are present
-SELECT COUNT(*) AS 'No of Null Dates', 
+SELECT COUNT(Assignment.TCS.Date) AS 'No of Null Dates', 
 	   COUNT(Assignment.TCS.`Close Price`) AS 'No of Null Close Price' 
 from Assignment.TCS
 WHERE Assignment.TCS.Date IS NULL OR 
@@ -170,6 +183,8 @@ WHERE Assignment.TCS.Date IS NULL OR
 Select Date, STR_TO_DATE(Date, '%d-%M-%Y') AS 'Date_As_Dateime' from TCS limit 5;
 
 -- Create the New Table containing the date, close price, 20 Day MA and 50 Day MA.
+DROP table IF EXISTS `tcs1`;
+
 CREATE TABLE `tcs1`(
 `Date` Date,
 `Close Price` double,
@@ -196,7 +211,7 @@ SELECT * from tcs1 limit 25;
 DESC TVS_Motors;
 
 -- Checking how many Null Values are present & it can be seen no zeroes are present
-SELECT COUNT(*) AS 'No of Null Dates', 
+SELECT COUNT(Assignment.TVS_Motors.Date) AS 'No of Null Dates', 
 	   COUNT(Assignment.TVS_Motors.`Close Price`) AS 'No of Null Close Price' 
 from Assignment.TVS_Motors
 WHERE Assignment.TVS_Motors.Date IS NULL OR 
@@ -206,6 +221,8 @@ WHERE Assignment.TVS_Motors.Date IS NULL OR
 Select Date, STR_TO_DATE(Date, '%d-%M-%Y') AS 'Date_As_Dateime' from TVS_Motors limit 5;
 
 -- Create the New Table containing the date, close price, 20 Day MA and 50 Day MA.
+DROP table IF EXISTS `tvs1`;
+
 CREATE TABLE `tvs1`(
 	`Date` Date,
 	`Close Price` double,
@@ -236,6 +253,7 @@ SELECT * from tvs1 limit 25;
 -- |++Date++|++Bajaj++|++TCS++|++TVS++|++Infosys++|++Eicher++|++Hero++|
 
 -- Creating the master table
+DROP TABLE IF exists `master_stock`;
 CREATE TABLE `master_stock` (
     `Date` DATE,
     `Bajaj` DOUBLE,
@@ -284,9 +302,20 @@ CREATE TABLE `bajaj2` (
 );
 
 -- Insert the data in the table & determine the Signal
+-- Idea is first determine whether the 20 Days MA is > 50 Days MA or not ( And create a signal for it 1 or 0 )
+-- And now on the above create Subset of Data 
+-- Apply a Window with a frame of 1 following
+-- Now inside that frame if the first value and Last Value is same = Hold
+-- If not then If the last Value is 1 ==> Buy otherwise it's sell
+
 INSERT INTO bajaj2(`Date`,`Close Price`, `Signal`)
-select 
-		Date,
+WITH cross_tab as (
+select
+		`Date`,
+		`Close Price` ,
+		if(`20 Day MA`>`50 Day MA`,'1','0') is_short_grt
+	from bajaj1 order by Date )
+SELECT Date,
 		`Close Price` ,
 		case when first_value(is_short_grt) over w = nth_value(is_short_grt,2) over w then  'Hold'
 				when NTH_VALUE(is_short_grt,2) over w = 1 then 'Buy'
@@ -294,22 +323,15 @@ select
                 else 'Hold' -- This is relevant only for the First Record as there is no Second Value 
                 end
 		 AS "Signal"
-	FROM
-(
-select
-		`Date`,
-		`Close Price` ,
-		if(`20 Day MA`>`50 Day MA`,'1','0') is_short_grt
-	from bajaj1 order by Date
-) cross_tab
-window w as (order by Date rows 1 preceding );
+FROM cross_tab
+window w as (order by Date rows between 0 preceding and 1 following);
  
 -- Select the top 5 entries
 SELECT * FROM bajaj2 LIMIT 5;
 
+-- Create Table eicher2
 drop table if exists `eicher2`;
 
--- Create Table eicher2
 CREATE TABLE `eicher2` (
     `Date` DATE,
     `Close Price` DOUBLE,
@@ -318,8 +340,13 @@ CREATE TABLE `eicher2` (
 
 -- Insert the data in the table & determine the Signal
 INSERT INTO eicher2(`Date`,`Close Price`, `Signal`)
-select 
-		Date,
+WITH cross_tab as (
+select
+		`Date`,
+		`Close Price` ,
+		if(`20 Day MA`>`50 Day MA`,'1','0') is_short_grt
+	from eicher1 order by Date )
+SELECT Date,
 		`Close Price` ,
 		case when first_value(is_short_grt) over w = nth_value(is_short_grt,2) over w then  'Hold'
 				when NTH_VALUE(is_short_grt,2) over w = 1 then 'Buy'
@@ -327,15 +354,8 @@ select
                 else 'Hold' -- This is relevant only for the First Record as there is no Second Value 
                 end
 		 AS "Signal"
-	FROM
-(
-select
-		`Date`,
-		`Close Price` ,
-		if(`20 Day MA`>`50 Day MA`,'1','0') is_short_grt
-	from eicher1 order by Date
-) cross_tab
-window w as (order by Date rows 1 preceding );
+FROM cross_tab
+window w as (order by Date rows between 0 preceding and 1 following);
 
 -- Select the top 5 entries
 SELECT * FROM eicher2 LIMIT 5;
@@ -350,8 +370,13 @@ CREATE TABLE `hero2` (
 
 -- Insert the data in the table & determine the Signal
 INSERT INTO hero2(`Date`,`Close Price`, `Signal`)
-select 
-		Date,
+WITH cross_tab as (
+select
+		`Date`,
+		`Close Price` ,
+		if(`20 Day MA`>`50 Day MA`,'1','0') is_short_grt
+	from hero1 order by Date )
+SELECT Date,
 		`Close Price` ,
 		case when first_value(is_short_grt) over w = nth_value(is_short_grt,2) over w then  'Hold'
 				when NTH_VALUE(is_short_grt,2) over w = 1 then 'Buy'
@@ -359,15 +384,8 @@ select
                 else 'Hold' -- This is relevant only for the First Record as there is no Second Value 
                 end
 		 AS "Signal"
-	FROM
-(
-select
-		`Date`,
-		`Close Price` ,
-		if(`20 Day MA`>`50 Day MA`,'1','0') is_short_grt
-	from hero1 order by Date
-) cross_tab
-window w as (order by Date rows 1 preceding );
+FROM cross_tab
+window w as (order by Date rows between 0 preceding and 1 following);
 
 
 -- Select the top 5 entries
@@ -383,8 +401,13 @@ CREATE TABLE `infosys2` (
 
 -- Insert the data in the table & determine the Signal
 INSERT INTO infosys2(`Date`,`Close Price`, `Signal`)
-select 
-		Date,
+WITH cross_tab as (
+select
+		`Date`,
+		`Close Price` ,
+		if(`20 Day MA`>`50 Day MA`,'1','0') is_short_grt
+	from infosys1 order by Date )
+SELECT Date,
 		`Close Price` ,
 		case when first_value(is_short_grt) over w = nth_value(is_short_grt,2) over w then  'Hold'
 				when NTH_VALUE(is_short_grt,2) over w = 1 then 'Buy'
@@ -392,15 +415,8 @@ select
                 else 'Hold' -- This is relevant only for the First Record as there is no Second Value 
                 end
 		 AS "Signal"
-	FROM
-(
-select
-		`Date`,
-		`Close Price` ,
-		if(`20 Day MA`>`50 Day MA`,'1','0') is_short_grt
-	from infosys1 order by Date
-) cross_tab
-window w as (order by Date rows 1 preceding );
+FROM cross_tab
+window w as (order by Date rows between 0 preceding and 1 following);
 
 -- Select the top 5 entries
 SELECT * FROM infosys2 LIMIT 5;
@@ -415,8 +431,13 @@ CREATE TABLE `tcs2` (
 
 -- Insert the data in the table & determine the Signal
 INSERT INTO tcs2(`Date`,`Close Price`, `Signal`)
-select 
-		Date,
+WITH cross_tab as (
+select
+		`Date`,
+		`Close Price` ,
+		if(`20 Day MA`>`50 Day MA`,'1','0') is_short_grt
+	from tcs1 order by Date )
+SELECT Date,
 		`Close Price` ,
 		case when first_value(is_short_grt) over w = nth_value(is_short_grt,2) over w then  'Hold'
 				when NTH_VALUE(is_short_grt,2) over w = 1 then 'Buy'
@@ -424,15 +445,8 @@ select
                 else 'Hold' -- This is relevant only for the First Record as there is no Second Value 
                 end
 		 AS "Signal"
-	FROM
-(
-select
-		`Date`,
-		`Close Price` ,
-		if(`20 Day MA`>`50 Day MA`,'1','0') is_short_grt
-	from tcs1 order by Date
-) cross_tab
-window w as (order by Date rows 1 preceding );
+FROM cross_tab
+window w as (order by Date rows between 0 preceding and 1 following);
 
 -- Select the top 5 entries
 SELECT * FROM tcs2 LIMIT 5;
@@ -447,8 +461,13 @@ CREATE TABLE `tvs2` (
 
 -- Insert the data in the table & determine the Signal
 INSERT INTO tvs2(`Date`,`Close Price`, `Signal`)
-select 
-		Date,
+WITH cross_tab as (
+select
+		`Date`,
+		`Close Price` ,
+		if(`20 Day MA`>`50 Day MA`,'1','0') is_short_grt
+	from tvs1 order by Date )
+SELECT Date,
 		`Close Price` ,
 		case when first_value(is_short_grt) over w = nth_value(is_short_grt,2) over w then  'Hold'
 				when NTH_VALUE(is_short_grt,2) over w = 1 then 'Buy'
@@ -456,28 +475,19 @@ select
                 else 'Hold' -- This is relevant only for the First Record as there is no Second Value 
                 end
 		 AS "Signal"
-	FROM
-(
-select
-		`Date`,
-		`Close Price` ,
-		if(`20 Day MA`>`50 Day MA`,'1','0') is_short_grt
-	from tvs1 order by Date
-) cross_tab
-window w as (order by Date rows 1 preceding );
+FROM cross_tab
+window w as (order by Date rows between 0 preceding and 1 following);
 
 -- Select the top 5 entries
 SELECT * FROM tvs2 LIMIT 5;
 
 -- 4. Create a User defined function, that takes the date as input and returns the signal for that particular day (Buy/Sell/Hold) for the Bajaj stock.
-
 -- For Bajaj
-
 CREATE FUNCTION determine_signal( Inp_Date date )
 returns varchar(5) deterministic
 return ( select `Signal` from bajaj2  where `Date` = Inp_Date );
 
 -- I/P : Date ( YYYY-MM-DD )
-SELECT determine_signal('2015-05-15') 'Signal_Now';
-
-select * from bajaj2;  -- where `Date` = Inp_Date
+SELECT determine_signal('2015-05-15') 'Signal_Now'; -- Buy will be Returned
+SELECT determine_signal('2015-08-24') 'Signal_Now'; -- Hold will be Returned
+SELECT determine_signal('2015-05-15') 'Signal_Now'; -- Buy will be Returned
